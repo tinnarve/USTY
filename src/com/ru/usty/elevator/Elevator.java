@@ -3,12 +3,14 @@ package com.ru.usty.elevator;
 public class Elevator implements Runnable {
 
 	int numberFloors, maxOccupants, currentFloor, currentOccupants;
+	Operator operator;
 
-	Elevator(int numberFloors, int maxOccupants) {
+	Elevator(int numberFloors, int maxOccupants, Operator operator) {
 		this.numberFloors = numberFloors;
 		this.maxOccupants = maxOccupants;
 		this.currentFloor = 0;
 		this.currentOccupants = 0;
+		this.operator = operator;
 	}
 
 	@Override
@@ -35,12 +37,14 @@ public class Elevator implements Runnable {
 		if(currentFloor + 1 < numberFloors)
 		{
 			currentFloor++;
+			operator.openElevator(this); 
 			try {
 				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			operator.closeElevator(this);
 		}
 	}
 
@@ -49,12 +53,14 @@ public class Elevator implements Runnable {
 		if(currentFloor != 0)
 		{
 			currentFloor--;
+			operator.openElevator(this); 
 			try {
 				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			operator.closeElevator(this);
 		}
 	}
 }

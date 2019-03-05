@@ -26,13 +26,14 @@ public class ElevatorScene {
 									// implement differently
 									// if it suits you
 	private static ArrayList<Integer> exitedCount = null;
-	private static Elevator[] elevators;
+	
 	private static List<Thread> threads;
 
 	public static Semaphore exitedCountMutex;
+	public static Semaphore enteredCountMutex;
+	private Operator operator;
 
-	public static Semaphore[] inSem;
-	public static Semaphore[] outSem;
+
 
 	// Base function: definition must not change
 	// Necessary to add your code in this one
@@ -42,8 +43,7 @@ public class ElevatorScene {
 		// into the elevator threads so that if restartScene is called several times in
 		// a row
 
-		inSem = new Semaphore[numberOfFloors];
-		outSem = new Semaphore[numberOfFloors];
+		
 
 		// new Thread(new Runnable() {
 		// @Override
@@ -63,13 +63,12 @@ public class ElevatorScene {
 		 * 
 		 * If you can, tell any currently running elevator threads to stop
 		 */
+		operator = new Operator(numberOfFloors, numberOfElevators);
 
 		this.numberOfFloors = numberOfFloors;
 		this.numberOfElevators = numberOfElevators;
 		personCount = new ArrayList<Integer>();
 		for (int i = 0; i < numberOfFloors; i++) {
-			inSem[i] = new Semaphore(0);
-			outSem[i] = new Semaphore(0);
 			personCount.add(0);
 		}
 
@@ -83,55 +82,38 @@ public class ElevatorScene {
 		}
 		exitedCountMutex = new Semaphore(1);
 
+		enteredCountMutex = new Semaphore(1);
+		
 		threads = new ArrayList<Thread>();
-
-		// Elevator setup
-		elevators = new Elevator[numberOfElevators];
-		for (int i = 0; i < numberOfElevators; i++) {
-			Elevator e = new Elevator(numberOfFloors, MAX_OCCUPANTS);
-			Thread e_thread = new Thread(e);
+		Elevator[] elevators = operator.getElevators();
+		for(int i = 0; i < numberOfElevators; i++) {
+			Thread e_thread = new Thread(elevators[i]);
 			threads.add(e_thread);
 			e_thread.start();
-			elevators[i] = e;
-			inSem[0].release(MAX_OCCUPANTS);
 		}
-	}
+		
 
-	public static Semaphore ingressLock = new Semaphore(1);
-	public static void addPersonToAvailableElevatorAtFloor(Person p, int floor) {
-		try {
-			ingressLock.acquire();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		boolean derp = false;
-		while(!derp)
-		{
-			for (Elevator e : elevators) 
-			{
-				if(e.currentFloor == floor && e.currentOccupants != e.maxOccupants)
-				{
-					e.addPerson(p);
-					derp = true;
-					personCount.set(floor, personCount.get(floor) - 1);
-					break;
-				}
-			}	
-			Thread.yield();	
-		}
-		ingressLock.release();
-	}	
+
+	}
+	
+	//addPersonToAvailableElevatorAtFloor call then
+	//personCount.set(floor, personCount.get(floor) - 1);
+
+	
 	//Base function: definition must not change
 	//Necessary to add your code in this one
 	public Thread addPerson(int sourceFloor, int destinationFloor) {
 		
-		Person person = new Person(sourceFloor, destinationFloor);
+		Person person = new Person(sourceFloor, destinationFloor, operator);
 		Thread person_thread = new Thread(person);
 		
 		//Can also be written like:
 		// Thread thread1 = new Thread(new Person(sourceFloor, destinationFloor));
 		
 		person_thread.start();
+		
+		//operator.addPerson(person);
+		
 		
 		/**
 		 * Important to add code here to make a
@@ -144,17 +126,17 @@ public class ElevatorScene {
 
 		//dumb code, replace it!
 		personCount.set(sourceFloor, personCount.get(sourceFloor) + 1);
-		return null;  //this means that the testSuite will not wait for the threads to finish
+		return person_thread;  //this means that the testSuite will not wait for the threads to finish
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getCurrentFloorForElevator(int elevator) {
-		return elevators[elevator].currentFloor;
+		return operator.getCurrentFloor(elevator);
 	}
 
 	//Base function: definition must not change, but add your code
 	public int getNumberOfPeopleInElevator(int elevator) {
-		return elevators[elevator].currentOccupants;
+		return operator.getNumPInElevator(elevator);
 	}
 
 	//Base function: definition must not change, but add your code
@@ -200,6 +182,19 @@ public class ElevatorScene {
 	//let the system know that they have exited.
 	//Person calls it after being let off elevator
 	//but before it finishes its run.
+	public static void personEntersAtFloor(int floor) 
+	{
+		try {
+			
+			enteredCountMutex.acquire();
+			personCount.set(floor, (personCount.get(floor) - 1));
+			enteredCountMutex.release();
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public static void personExitsAtFloor(int floor) {
 		try {
 			
