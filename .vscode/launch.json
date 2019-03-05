@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - ElevatorMainProgram",
+            "request": "launch",
+            "mainClass": "com.ru.usty.elevator.ElevatorMainProgram",
+            "projectName": "ElevatorThreads_kolfinna17_tinna17"
+        }
+    ]
+}
