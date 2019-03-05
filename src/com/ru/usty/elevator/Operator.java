@@ -70,21 +70,16 @@ public class Operator {
 	
 	public void openElevator(Elevator e) 
 	{
-//		try {
-//			Thread.sleep(100);
-//		} catch (InterruptedException e1){
-//			e1.printStackTrace();
-//		}
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e1){
+			e1.printStackTrace();
+		}
 		outSem[e.currentFloor].release(MAX_OCCUPANTS);
 		inSem[e.currentFloor].release(MAX_OCCUPANTS - e.currentOccupants);
 	}
 	public void closeElevator(Elevator e) 
 	{
-//		try {
-//			Thread.sleep(100);
-//		} catch (InterruptedException e1){
-//			e1.printStackTrace();
-//		}
 		outSem[e.currentFloor].drainPermits();
 		inSem[e.currentFloor].drainPermits();	
 	}

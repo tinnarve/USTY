@@ -39,7 +39,7 @@ public class Elevator implements Runnable {
 			currentFloor++;
 			operator.openElevator(this); 
 			try {
-				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME - 50);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -55,7 +55,7 @@ public class Elevator implements Runnable {
 			currentFloor--;
 			operator.openElevator(this); 
 			try {
-				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME);
+				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME - 50);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

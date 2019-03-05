@@ -20,7 +20,6 @@ public class Person implements Runnable {
 			operator.addPersonToAvailableElevatorAtFloor(this, source);
 			ElevatorScene.personEntersAtFloor(source);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -30,9 +29,13 @@ public class Person implements Runnable {
 			// outSem
 			if(myElevator != null && myElevator.currentFloor == dest)
 			{
-				
-				ElevatorScene.personExitsAtFloor(dest);
-				myElevator.removePerson();
+				try {
+					operator.outSem[dest].acquire();
+					ElevatorScene.personExitsAtFloor(dest);
+					myElevator.removePerson();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				return;
 			}	
 			Thread.yield();
