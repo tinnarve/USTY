@@ -28,12 +28,21 @@ public class ElevatorScene {
 	public static Semaphore exitedCountMutex;
 	//
 	public static Semaphore sem;
+	
+	public static Semaphore [] inSem;
+	public static Semaphore [] outSem;
+	
 
 	//Base function: definition must not change
 	//Necessary to add your code in this one
 	public void restartScene(int numberOfFloors, int numberOfElevators) {
+		
+		//Need to add a true or false that tells the system if it should join 
+		//into the elevator threads so that if restartScene is called several times in a row
 
 		sem = new Semaphore(0);
+		inSem = new Semaphore [numberOfFloors];
+		outSem = new Semaphore [numberOfFloors];
 		
 		new Thread(new Runnable() {
 
@@ -47,6 +56,11 @@ public class ElevatorScene {
 			}
 			
 		}).start();
+		
+		for(int i = 0; i < numberOfFloors; i++) {
+			inSem[i] = new Semaphore(0);
+			outSem[i] = new Semaphore(0);
+		}
 		
 		/**
 		 * Important to add code here to make new
@@ -85,10 +99,12 @@ public class ElevatorScene {
 		
 		Person person = new Person(sourceFloor, destinationFloor);
 		Thread person_thread = new Thread(person);
+		
 		//Can also be written like:
 		// Thread thread1 = new Thread(new Person(sourceFloor, destinationFloor));
 		
 		person_thread.start();
+		
 		/**
 		 * Important to add code here to make a
 		 * new thread that runs your person-runnable
