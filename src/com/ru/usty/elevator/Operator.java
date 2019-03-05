@@ -70,12 +70,19 @@ public class Operator {
 	
 	public void openElevator(Elevator e) 
 	{
+		//wait for the doors to open in visualizer
 		try {
 			Thread.sleep(50);
 		} catch (InterruptedException e1){
 			e1.printStackTrace();
 		}
 		outSem[e.currentFloor].release(MAX_OCCUPANTS);
+		//wait for the people to leave so that more can go in.
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e1){
+			e1.printStackTrace();
+		}
 		inSem[e.currentFloor].release(MAX_OCCUPANTS - e.currentOccupants);
 	}
 	public void closeElevator(Elevator e) 

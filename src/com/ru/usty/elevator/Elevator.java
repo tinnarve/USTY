@@ -4,20 +4,22 @@ public class Elevator implements Runnable {
 
 	int numberFloors, maxOccupants, currentFloor, currentOccupants;
 	Operator operator;
+	Boolean goUp;
 
 	Elevator(int numberFloors, int maxOccupants, Operator operator) {
 		this.numberFloors = numberFloors;
 		this.maxOccupants = maxOccupants;
-		this.currentFloor = 0;
+		this.currentFloor = -1; //start in -1 so that it waits for people to get in for the first trip
 		this.currentOccupants = 0;
 		this.operator = operator;
+		goUp = true;
 	}
 
 	@Override
 	public void run() {
+		
 		while (true) {
-			// TODO stuff
-			if(currentFloor == 0) moveUp();
+			if(goUp) moveUp();
 			else moveDown();
 			Thread.yield();
 		}
@@ -41,10 +43,12 @@ public class Elevator implements Runnable {
 			try {
 				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME - 50);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			operator.closeElevator(this);
+			if(currentFloor == numberFloors-1) {
+				goUp = false;
+			}
 		}
 	}
 
@@ -61,6 +65,9 @@ public class Elevator implements Runnable {
 				e.printStackTrace();
 			}
 			operator.closeElevator(this);
+			if(currentFloor == 0) {
+				goUp = true;
+			}
 		}
 	}
 }
