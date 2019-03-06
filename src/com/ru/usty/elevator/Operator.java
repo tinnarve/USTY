@@ -1,6 +1,4 @@
 package com.ru.usty.elevator;
-
-import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
 public class Operator {
@@ -9,7 +7,8 @@ public class Operator {
 	private int numElevators;
 
 	
-	public Semaphore[] inSem;
+	public Semaphore[] inSemDown;
+	public Semaphore[] inSemUp;
 	public Semaphore[] outSem;
 	private static Elevator[] elevators;
 	public static final int MAX_OCCUPANTS = 6;
@@ -22,11 +21,13 @@ public class Operator {
 		numElevators = nElevators;
 		
 		
-		inSem = new Semaphore[numFloors];
+		inSemDown = new Semaphore[numFloors];
+		inSemUp = new Semaphore[numFloors];
 		outSem = new Semaphore[numFloors];
 		
 		for (int i = 0; i < numFloors; i++) {
-			inSem[i] = new Semaphore(0);
+			inSemDown[i] = new Semaphore(0);
+			inSemUp[i] = new Semaphore(0);
 			outSem[i] = new Semaphore(0);
 		}
 		elevators = new Elevator[numElevators];
@@ -40,9 +41,6 @@ public class Operator {
 	public Elevator[] getElevators() {
 		
 		return elevators;
-	}
-	public void addPerson(Person p) {
-		
 	}
 	
 	public void addPersonToAvailableElevatorAtFloor(Person p, int floor) {
@@ -83,12 +81,18 @@ public class Operator {
 		} catch (InterruptedException e1){
 			e1.printStackTrace();
 		}
-		inSem[e.currentFloor].release(MAX_OCCUPANTS - e.currentOccupants);
+		if(e.getDirection() == true) {
+			inSemUp[e.currentFloor].release(MAX_OCCUPANTS - e.currentOccupants);
+		}
+		else {
+			inSemDown[e.currentFloor].release(MAX_OCCUPANTS - e.currentOccupants);
+		}
 	}
 	public void closeElevator(Elevator e) 
 	{
 		outSem[e.currentFloor].drainPermits();
-		inSem[e.currentFloor].drainPermits();	
+		inSemUp[e.currentFloor].drainPermits();	
+		inSemDown[e.currentFloor].drainPermits();
 	}
 	
 	public int getCurrentFloor(int e) {
@@ -97,5 +101,6 @@ public class Operator {
 	public int getNumPInElevator(int e) {
 		return elevators[e].currentOccupants;
 	}
+	
 	//
 }

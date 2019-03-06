@@ -5,29 +5,39 @@ public class Person implements Runnable {
 	int source, dest;
 	Elevator myElevator;
 	Operator operator;
+	public Boolean up;
 
 	Person(int source, int dest, Operator op) {
 		this.source = source;
 		this.dest = dest;
 		operator = op;
+		if(source > dest) {
+			up = false;
+		}
+		else {
+			up = true;
+		}
 	}
 
 	@Override
 	public void run() {
-		
+
 		try {
-			operator.inSem[source].acquire();
+			if(up) {
+				operator.inSemUp[source].acquire();
+			}
+			else {
+				operator.inSemDown[source].acquire();
+			}
+			
 			operator.addPersonToAvailableElevatorAtFloor(this, source);
 			ElevatorScene.personEntersAtFloor(source);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
-		while(true)
-		{
-			
-			// outSem
-			if(myElevator != null && myElevator.currentFloor == dest)
+		
+		while(true) {
+			if(myElevator.currentFloor == dest)
 			{
 				try {
 					operator.outSem[dest].acquire();

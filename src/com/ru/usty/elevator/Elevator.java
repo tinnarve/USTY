@@ -36,9 +36,13 @@ public class Elevator implements Runnable {
 	}
 
 	public void moveUp() {
+		
 		if(currentFloor + 1 < numberFloors)
 		{
 			currentFloor++;
+			if(currentFloor == numberFloors-1) {
+				goUp = false;
+			}
 			operator.openElevator(this); 
 			try {
 				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME - 50);
@@ -46,9 +50,7 @@ public class Elevator implements Runnable {
 				e.printStackTrace();
 			}
 			operator.closeElevator(this);
-			if(currentFloor == numberFloors-1) {
-				goUp = false;
-			}
+
 		}
 	}
 
@@ -57,17 +59,20 @@ public class Elevator implements Runnable {
 		if(currentFloor != 0)
 		{
 			currentFloor--;
+			if(currentFloor == 0) {
+				goUp = true;
+			}
 			operator.openElevator(this); 
 			try {
 				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME - 50);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			operator.closeElevator(this);
-			if(currentFloor == 0) {
-				goUp = true;
-			}
+			
 		}
+	}
+	public Boolean getDirection() {
+		return goUp;
 	}
 }

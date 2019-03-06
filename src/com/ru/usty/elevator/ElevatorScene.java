@@ -39,22 +39,6 @@ public class ElevatorScene {
 	// Necessary to add your code in this one
 	public void restartScene(int numberOfFloors, int numberOfElevators) {
 
-		// Need to add a true or false that tells the system if it should join
-		// into the elevator threads so that if restartScene is called several times in
-		// a row
-
-		
-
-		// new Thread(new Runnable() {
-		// @Override
-		// public void run() {
-		// for(int i = 0; i < 20; i++) {
-		// sem.release();
-		// System.out.println("Permits " + sem.availablePermits());
-		// }
-		// }
-		// }).start();
-
 		/**
 		 * Important to add code here to make new threads that run your
 		 * elevator-runnables
@@ -106,6 +90,7 @@ public class ElevatorScene {
 		
 		Person person = new Person(sourceFloor, destinationFloor, operator);
 		Thread person_thread = new Thread(person);
+		//List<Person> listUp = new ArrayList<person>;
 		
 		//Can also be written like:
 		// Thread thread1 = new Thread(new Person(sourceFloor, destinationFloor));
@@ -191,7 +176,6 @@ public class ElevatorScene {
 			enteredCountMutex.release();
 
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -203,9 +187,11 @@ public class ElevatorScene {
 			exitedCountMutex.release();
 
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public static int getPersonCount(int floor) {
+		return personCount.get(floor);
 	}
 
 	//Base function: no need to change, just for visualization
