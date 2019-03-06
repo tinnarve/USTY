@@ -2,8 +2,6 @@ package com.ru.usty.elevator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -17,7 +15,7 @@ public class ElevatorScene {
 
 	// TO SPEED THINGS UP WHEN TESTING,
 	// feel free to change this. It will be changed during grading
-	public static final int VISUALIZATION_WAIT_TIME = 1000; // milliseconds
+	public static final int VISUALIZATION_WAIT_TIME = 500; // milliseconds
 	public static final int MAX_OCCUPANTS = 6;
 
 	private int numberOfFloors;
@@ -29,37 +27,17 @@ public class ElevatorScene {
 									// if it suits you
 	private static ArrayList<Integer> exitedCount = null;
 	
-	private static ExecutorService threads;
+	private static List<Thread> threads;
 
 	public static Semaphore exitedCountMutex;
 	public static Semaphore enteredCountMutex;
 	private Operator operator;
 
-
-
 	// Base function: definition must not change
 	// Necessary to add your code in this one
 	public void restartScene(int numberOfFloors, int numberOfElevators) {
-
-		/**
-		 * Important to add code here to make new threads that run your
-		 * elevator-runnables
-		 * 
-		 * Also add any other code that initializes your system for a new run
-		 * 
-		 * If you can, tell any currently running elevator threads to stop
-		 */
-
-		//TODO Kill all the threads
-		if(threads != null)
-		{
-			System.out.println("killing threads");
-			threads.shutdownNow();
-			System.out.println("waiting for threads to die");
-			while(!threads.isTerminated()){}
-			System.out.println("threads dead");
-		}	
-		threads = Executors.newCachedThreadPool();
+		
+		
 		operator = new Operator(numberOfFloors, numberOfElevators);
 
 		this.numberOfFloors = numberOfFloors;
@@ -81,11 +59,12 @@ public class ElevatorScene {
 
 		enteredCountMutex = new Semaphore(1);
 		
+		threads = new ArrayList<Thread>();
 		Elevator[] elevators = operator.getElevators();
 		for(int i = 0; i < numberOfElevators; i++) {
 			Thread e_thread = new Thread(elevators[i]);
-			threads.execute(e_thread);
-			// e_thread.start();
+			threads.add(e_thread);
+			e_thread.start();
 		}
 		
 
@@ -108,7 +87,7 @@ public class ElevatorScene {
 		// Thread thread1 = new Thread(new Person(sourceFloor, destinationFloor));
 		
 		person_thread.start();
-		// threads.execute(person_thread);
+		
 		//operator.addPerson(person);
 		
 		

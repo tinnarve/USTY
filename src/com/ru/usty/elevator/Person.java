@@ -5,7 +5,7 @@ public class Person implements Runnable {
 	int source, dest;
 	Elevator myElevator;
 	Operator operator;
-	public Boolean up;
+	private Boolean up;
 	Thread t;
 
 	Person(int source, int dest, Operator op) {
@@ -19,7 +19,6 @@ public class Person implements Runnable {
 			up = true;
 		}
 	}
-
 	@Override
 	public void run() {
 
