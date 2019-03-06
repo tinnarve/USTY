@@ -31,8 +31,11 @@ public class Operator {
 			outSem[i] = new Semaphore(0);
 		}
 		elevators = new Elevator[numElevators];
+		int floorCounter = -1;
 		for (int i = 0; i < numElevators; i++) {
 			Elevator e = new Elevator(numFloors, MAX_OCCUPANTS, this);
+			e.currentFloor = floorCounter;
+			floorCounter = (floorCounter + 1)%(numFloors - 1);
 			elevators[i] = e;
 		}
 		
@@ -68,24 +71,37 @@ public class Operator {
 	
 	public void openElevator(Elevator e) 
 	{
-		//wait for the doors to open in visualizer
+		//Wait for the elevator to reach the designated floor
 		try {
-			Thread.sleep(50);
+			Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME / 3);
 		} catch (InterruptedException e1){
-			e1.printStackTrace();
+			e.die();
+			return;
 		}
+
+		//Let people out
 		outSem[e.currentFloor].release(MAX_OCCUPANTS);
-		//wait for the people to leave so that more can go in.
 		try {
-			Thread.sleep(50);
+			Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME / 3);
 		} catch (InterruptedException e1){
-			e1.printStackTrace();
+			e.die();
+			return;
 		}
+		
+		//Let people in, depending on where they're going
 		if(e.getDirection() == true) {
 			inSemUp[e.currentFloor].release(MAX_OCCUPANTS - e.currentOccupants);
 		}
 		else {
 			inSemDown[e.currentFloor].release(MAX_OCCUPANTS - e.currentOccupants);
+		}
+		
+		//Wait for the doors to close
+		try {
+			Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME / 3);
+		} catch (InterruptedException e1){
+			e.die();
+			return;
 		}
 	}
 	public void closeElevator(Elevator e) 

@@ -6,6 +6,7 @@ public class Person implements Runnable {
 	Elevator myElevator;
 	Operator operator;
 	public Boolean up;
+	Thread t;
 
 	Person(int source, int dest, Operator op) {
 		this.source = source;

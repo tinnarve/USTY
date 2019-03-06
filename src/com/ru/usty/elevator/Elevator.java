@@ -5,6 +5,7 @@ public class Elevator implements Runnable {
 	int numberFloors, maxOccupants, currentFloor, currentOccupants;
 	Operator operator;
 	Boolean goUp;
+	private boolean exit;
 
 	Elevator(int numberFloors, int maxOccupants, Operator operator) {
 		this.numberFloors = numberFloors;
@@ -12,15 +13,18 @@ public class Elevator implements Runnable {
 		this.currentFloor = -1; //start in -1 so that it waits for people to get in for the first trip
 		this.currentOccupants = 0;
 		this.operator = operator;
-		goUp = true;
+		this.exit = false;
+		if(currentFloor == numberFloors - 1) goUp = false;
+		else goUp = true;
 	}
 
 	@Override
 	public void run() {
 		
-		while (true) {
+		while (!exit) {
 			if(goUp) moveUp();
 			else moveDown();
+			if(Thread.interrupted()) break;
 			Thread.yield();
 		}
 	}
@@ -35,6 +39,12 @@ public class Elevator implements Runnable {
 		currentOccupants--;
 	}
 
+	public void die()
+	{
+		System.out.println("Asked to stop. Stopping.");
+		this.exit = true;
+	}
+
 	public void moveUp() {
 		
 		if(currentFloor + 1 < numberFloors)
@@ -44,13 +54,13 @@ public class Elevator implements Runnable {
 				goUp = false;
 			}
 			operator.openElevator(this); 
-			try {
-				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME - 50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			// try {
+			// 	Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME - 50);
+			// } catch (InterruptedException e) {
+			// 	die();
+			// 	return;
+			// }
 			operator.closeElevator(this);
-
 		}
 	}
 
@@ -63,11 +73,12 @@ public class Elevator implements Runnable {
 				goUp = true;
 			}
 			operator.openElevator(this); 
-			try {
-				Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME - 50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			// try {
+			// 	Thread.sleep(ElevatorScene.VISUALIZATION_WAIT_TIME - 50);
+			// } catch (InterruptedException e) {
+			// 	die();
+			// 	return;
+			// }
 			operator.closeElevator(this);
 			
 		}

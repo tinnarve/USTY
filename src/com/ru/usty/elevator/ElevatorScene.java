@@ -2,6 +2,8 @@ package com.ru.usty.elevator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -27,7 +29,7 @@ public class ElevatorScene {
 									// if it suits you
 	private static ArrayList<Integer> exitedCount = null;
 	
-	private static List<Thread> threads;
+	private static ExecutorService threads;
 
 	public static Semaphore exitedCountMutex;
 	public static Semaphore enteredCountMutex;
@@ -47,6 +49,17 @@ public class ElevatorScene {
 		 * 
 		 * If you can, tell any currently running elevator threads to stop
 		 */
+
+		//TODO Kill all the threads
+		if(threads != null)
+		{
+			System.out.println("killing threads");
+			threads.shutdownNow();
+			System.out.println("waiting for threads to die");
+			while(!threads.isTerminated()){}
+			System.out.println("threads dead");
+		}	
+		threads = Executors.newCachedThreadPool();
 		operator = new Operator(numberOfFloors, numberOfElevators);
 
 		this.numberOfFloors = numberOfFloors;
@@ -68,12 +81,11 @@ public class ElevatorScene {
 
 		enteredCountMutex = new Semaphore(1);
 		
-		threads = new ArrayList<Thread>();
 		Elevator[] elevators = operator.getElevators();
 		for(int i = 0; i < numberOfElevators; i++) {
 			Thread e_thread = new Thread(elevators[i]);
-			threads.add(e_thread);
-			e_thread.start();
+			threads.execute(e_thread);
+			// e_thread.start();
 		}
 		
 
@@ -96,7 +108,7 @@ public class ElevatorScene {
 		// Thread thread1 = new Thread(new Person(sourceFloor, destinationFloor));
 		
 		person_thread.start();
-		
+		// threads.execute(person_thread);
 		//operator.addPerson(person);
 		
 		
